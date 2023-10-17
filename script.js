@@ -1,102 +1,129 @@
+const body = document.body;
+const btnRock = document.querySelector('.rock');
+const btnPaper = document.querySelector('.paper');
+const btnScissors = document.querySelector('.scissors');
+const player = document.querySelector('.player-score');
+const computer = document.querySelector('.computer-score');
+const displayWinner = document.querySelector('.winner');
+const btnReset = document.createElement('button');
+btnReset.textContent = 'Play Again!';
+
+let playerSelection = '';
+let computerSelection = '';
+let roundWinner = '';
+let playerScore = 0;
+let computerScore = 0;
+
+btnRock.addEventListener('click', () => {
+    playerSelection = "rock";   
+    computerSelection = getComputerChoice();
+    roundWinner = playRound(playerSelection, computerSelection);
+    countPoints(roundWinner);
+    gameWinner(playerScore, computerScore, playAgain);
+});
+
+btnPaper.addEventListener('click', () => {
+    playerSelection = "paper";   
+    computerSelection = getComputerChoice();
+    roundWinner = playRound(playerSelection, computerSelection);
+    countPoints(roundWinner);
+    gameWinner(playerScore, computerScore, playAgain);
+});
+
+btnScissors.addEventListener('click', () => {
+    playerSelection = "scissors";   
+    computerSelection = getComputerChoice();
+    roundWinner = playRound(playerSelection, computerSelection);
+    countPoints(roundWinner);
+    gameWinner(playerScore, computerScore, playAgain);
+});
+
 function getComputerChoice() {
     return Math.floor(Math.random() * 3) + 1;
+    /* getComputerChoice():
+    1: rock
+    2: paper
+    3: scissors 
+    */
 }
-/* getComputerChoice():
-1: rock
-2: paper
-3: scissors 
-*/
 
 function playRound(playerSelection, computerSelection) {
-    let playerSelectionLower = playerSelection.toLowerCase();
-    switch (playerSelectionLower) {
+    switch (playerSelection) {
         case "rock":
             if (computerSelection == 1) {
-                return "It's a Draw! Rock equals Rock";
+                displayWinner.textContent = "It's a Draw! Rock equals Rock";
+                return "Draw";
             } else if (computerSelection == 2) {
-                return "You Lose! Paper beats Rock";
+                displayWinner.textContent = "You Lose! Paper beats Rock";
+                return "You Lose";
             } else if (computerSelection == 3) {
-                return "You Win! Rock beats Scissors";
+                displayWinner.textContent = "You Win! Rock beats Scissors";
+                return "You Win";
             }
-            break;
         case "paper":
             if (computerSelection == 1) {
-                return "You Win! Paper beats Rock";
+                displayWinner.textContent = "You Win! Paper beats Rock";
+                return "You Win";
             } else if (computerSelection == 2) {
-                return "It's a Draw! Paper equals Paper";
+                displayWinner.textContent = "It's a Draw! Paper equals Paper";
+                return "Draw";
             } else if (computerSelection == 3) {
-                return "You Lose! Scissors beats Paper";
+                displayWinner.textContent = "You Lose! Scissors beats Paper";
+                return "You Lose";
             }
-            break;
         case "scissors":
             if (computerSelection == 1) {
-                return "You Lose! Rock beats Scissors";
+                displayWinner.textContent = "You Lose! Rock beats Scissors";
+                return "You Lose";
             } else if (computerSelection == 2) {
-                return "You Win! Scissors beats Paper";
+                displayWinner.textContent = "You Win! Scissors beats Paper";
+                return "You Win";
             } else if (computerSelection == 3) {
-                return "It's a Draw! Scissors equals Scissors";
+                displayWinner.textContent = "It's a Draw! Scissors equals Scissors";
+                return "Draw";
             }
+    }
+}
+
+function countPoints(roundWinner) {
+    switch (roundWinner) {
+        //player wins
+        case "You Win":
+            playerScore++;
+            player.textContent = playerScore;
+            break;
+        //computer wins
+        case "You Lose":
+            computerScore++;
+            computer.textContent = computerScore;
+            break;
+        //draw
+        case "Draw":
             break;
     }
 }
 
-function countPoints(result) {
-    switch (result) {
-        //player wins
-        case "You Win! Rock beats Scissors":
-        case "You Win! Paper beats Rock":
-        case "You Win! Scissors beats Paper":
-            return "player";
-        //computer wins
-        case "You Lose! Paper beats Rock":
-        case "You Lose! Scissors beats Paper":
-        case "You Lose! Rock beats Scissors":
-            return "computer";
-        //draw
-        case "It's a Draw! Rock equals Rock":
-        case "It's a Draw! Paper equals Paper":
-        case "It's a Draw! Scissors equals Scissors":
-            return "draw";
+function gameWinner(playerScore, computerScore, playAgain) {
+    if (playerScore >= 5) {
+        displayWinner.textContent = "You WIN the game!"; 
+        console.log("WIN");
+        playAgain();
+    } else if (computerScore >= 5) {
+        displayWinner.textContent = "You LOSE the game!";
+        console.log("LOSE");
+        playAgain();
     }
 }
 
-function selectWinner(playerScore, computerScore) {
-    if (playerScore > computerScore) {
-        console.log("You WIN the game!");
-    } else if (playerScore < computerScore) {
-        console.log("You LOSE the game!");
-    } else {
-        console.log("It's a TIE!");
-    }
+function playAgain() {
+    btnRock.disabled = true;
+    btnPaper.disabled = true;
+    btnScissors.disabled = true;
+
+    body.appendChild(btnReset);
+    btnReset.addEventListener("click", () => {
+        location.reload();
+    });
 }
 
-function game(getComputerChoice, playRound, countPoints, selectWinner) {
-    let playerScore = 0;
-    let computerScore = 0;
-
-    for (let i = 1; i <= 5; i++) { //Play for 5 rounds
-        console.log("Round " + i + ":");
-
-        let playerSelection = prompt("Select Rock, Paper, or Scissors?");
-        let computerSelection = getComputerChoice();
-
-        let result = playRound(playerSelection, computerSelection);
-        console.log(result);
-
-        //Add score to the winner of the round
-        switch ( countPoints(result) ) {
-            case "player":
-                playerScore++;
-                break;
-            case "computer":
-                computerScore++;
-                break;
-            case "draw":
-                break;
-        }
-    }
-
-    selectWinner(playerScore, computerScore);
-}
-
-game(getComputerChoice, playRound, countPoints, selectWinner); 
+/* Note: I try reset scores inside gameWinner() but it cannot work. The scores reach 5, reset to 0, and cannot count after that. Are there any method to fix this? */
